@@ -1,34 +1,26 @@
-{% extends "base.html" %}
-
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <div class="form-body">
-    <div class="wrapper">
-        <div class="auth-container">
-            <h6 class="h4 auth-form-header font-weight-normal">RECOVER USERNAME</h6> 
-            <div class="auth-form">
-                <form action="" method="post" novalidate>
-                    {{ form.hidden_tag() }}
+  <div class="wrapper">
+    <div class="auth-container">
+      <h6 class="h4 auth-form-header font-weight-normal">RECOVER USERNAME</h6>
+      <div class="auth-form">
+        <form action="" method="post" novalidate>
+          {{ form.hidden_tag() }} {% include "_flash.html" %}
 
-                    {% include "_flash.html" %}
+          <div class="form-item">
+            {{ form.email.label(class="sr-only") }} {{ form.email(placeholder="Enter your Email", class="form-control")
+            }} {% for error in form.email.errors %}
+            <hr class="not-valid-border" />
+            <span class="not-valid">{{ error }}</span>
+            {% endfor %}
+          </div>
 
-                    <div class="form-item">
-                        {{ form.email.label(class="sr-only") }}
-                        {{ form.email(placeholder="Enter your Email", class="form-control") }}
-                        {% for error in form.email.errors %}
-                        <hr class="not-valid-border">
-                        <span class="not-valid">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                    
-                    <div class="button-container">
-                        <div class="form-item">
-                            {{ form.submit(class="btn btn-lg btn-secondary", value="Continue") }}
-                        </div>
-                    </div>
-                    
-                </form> 
-            </div>
-        </div>
+          <div class="button-container">
+            <div class="form-item">{{ form.submit(class="btn btn-lg btn-secondary", value="Continue") }}</div>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

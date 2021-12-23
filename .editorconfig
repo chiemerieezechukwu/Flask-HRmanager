@@ -1,0 +1,54 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# Docstrings and comments use max_line_length = 79
+[*.py]
+max_line_length = 119
+
+# Use 2 spaces for the HTML files
+[*.html]
+indent_size = 2
+max_line_length = 119
+ij_continuation_indent_size = 2
+ij_html_align_attributes = false
+ij_html_align_text = false
+ij_html_attribute_wrap = normal
+ij_html_block_comment_at_first_column = true
+ij_html_do_not_align_children_of_min_lines = 0
+ij_html_do_not_break_if_inline_tags = title,h1,h2,h3,h4,h5,h6,p,em
+ij_html_do_not_indent_children_of_tags = html,body,thead,tbody,tfoot
+ij_html_enforce_quotes = false
+ij_html_inline_tags = a,abbr,acronym,b,basefont,bdo,big,br,cite,cite,code,dfn,em,font,i,img,input,kbd,label,q,s,samp,select,small,span,strike,strong,sub,sup,textarea,tt,u,var
+ij_html_new_line_after_last_attribute = when multiline
+ij_html_new_line_before_first_attribute = never
+ij_html_quote_style = double
+
+# The JSON files contain newlines inconsistently
+[*.json]
+indent_size = 2
+insert_final_newline = ignore
+
+# Minified JavaScript files shouldn't be changed
+[**.min.js]
+indent_style = ignore
+insert_final_newline = ignore
+
+# Makefiles always use tabs for indentation
+[Makefile]
+indent_style = tab
+
+[*.yml]
+indent_size = 2
+
+[*.yaml]
+indent_size = 2

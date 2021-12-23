@@ -1,7 +1,6 @@
 coolhr/static/profile_images/avatars
 venv
 database.db
-.vscode
 LICENSE.txt
 
 ### Flask ###
