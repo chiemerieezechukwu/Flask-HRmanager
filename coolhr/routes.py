@@ -1,7 +1,11 @@
 from datetime import datetime
-from flask import render_template, redirect, url_for, request, flash, session, abort
+from flask import render_template, redirect, url_for, request, flash, session
 from coolhr import app, db
-from .errors.errors import not_found_error, access_forbidden_error, internal_error  # noqa
+from .errors.errors import (  # noqa
+    not_found_error,
+    access_forbidden_error,
+    internal_error,
+)
 from coolhr.forms import (
     LoginForm,
     CompanyUsername,
@@ -13,49 +17,15 @@ from coolhr.forms import (
     EmployeeUpdateProfileForm,
     UploadImageForm,
 )
-from coolhr.email import (
+from .utils import (  # noqa
+    save_images,
+    access_company,
+    access_employee,
     send_welcome_email,
     send_password_reset_email,
     send_company_username_email,
 )
 from coolhr.models import Companies, Employees, Trainings
-from .utils.handle_images import save_images
-from functools import wraps
-
-
-# add a functionality that takes them to the page they initially tried to visit if they are logged in correctly
-def access_company(function):
-    @wraps(function)
-    def wrapper(*args, **kwargs):
-        if not (session.get("company_email") or session.get("employee_email")):
-            return redirect(url_for("company_username"))
-        company = Companies.query.filter_by(
-            company_email=session.get("company_email"),
-            company_username=kwargs["company_username"],
-        ).first()
-        if company is None:
-            abort(403)
-        return function(*args, **kwargs)
-
-    return wrapper
-
-
-def access_employee(function):
-    @wraps(function)
-    def wrapper(*args, **kwargs):
-        if not (session.get("company_email") or session.get("employee_email")):
-            return redirect(url_for("company_username"))
-        employee = Employees.query.filter_by(
-            employee_email=session.get("employee_email")
-        ).first()
-        if employee is None:
-            abort(403)
-        e_company = Companies.query.filter_by(company_id=employee.company_id).first()
-        if e_company.company_username != kwargs["company_username"]:
-            abort(403)
-        return function(*args, **kwargs)
-
-    return wrapper
 
 
 @app.route("/")
@@ -87,7 +57,7 @@ def company_signup():
         company.set_password(form.company_password.data)
         db.session.add(company)
         db.session.commit()
-        #todo send_welcome_email(company, username=company.company_username)
+        # todo send_welcome_email(company, username=company.company_username)
         flash("Your Company has been successfully registered.<br>Login here", "dark")
         return redirect(url_for("login", company_username=form.company_username.data))
     return render_template("company_signup.html", form=form, alert_type="form-alert")
@@ -171,7 +141,7 @@ def employeeregister(company_username):
         db.session.add(employee)
         db.session.commit()
         flash("Employee successfully registered", "dark")
-        #todo send_welcome_email(employee, username=company.company_username)
+        # todo send_welcome_email(employee, username=company.company_username)
         return redirect(url_for("login", company_username=company_username))
     return render_template(
         "employee_signup.html", form=form, company_username=company_username
@@ -473,12 +443,18 @@ def training_subscription(company_username):
             if trainings not in employee.training_subscriptions:
                 trainings.subscribers.append(employee)
                 db.session.commit()
-                flash("You've been subscribed to {}".format(trainings.training_name))
+                flash(
+                    "You've been subscribed to {}".format(trainings.training_name),
+                    "success",
+                )
                 return redirect(
                     url_for("training_subscription", company_username=company_username)
                 )
             else:
-                flash("You're already subscribed to {}".format(trainings.training_name))
+                flash(
+                    "You're already subscribed to {}".format(trainings.training_name),
+                    "warning",
+                )
                 return redirect(
                     url_for("training_subscription", company_username=company_username)
                 )
@@ -496,7 +472,8 @@ def training_subscription(company_username):
                 trainings.subscribers.remove(employee)
                 db.session.commit()
                 flash(
-                    "You've been unsubscribed from {}".format(trainings.training_name)
+                    "You've been unsubscribed from {}".format(trainings.training_name),
+                    "danger",
                 )
                 return redirect(
                     url_for("training_subscription", company_username=company_username)
@@ -558,10 +535,15 @@ def profile(company_username):
     elif form2.upload.data:
         if form2.validate_on_submit():
             old_image = employee.employee_image
-            image_file = save_images(form2.image.data, old_image)
-            employee.employee_image = image_file
-            db.session.commit()
+            try:
+                image_file = save_images(form2.image.data, old_image)
+                employee.employee_image = image_file
+                db.session.commit()
+            except:
+                flash("Image not saved. The file may be corrupted", "danger")
             flash("Image has been uploaded", "success")
+        else:
+            flash("The picture format is not supported", "danger")
         return redirect(url_for("profile", company_username=company_username))
     elif request.method == "GET":
         form.employee_name.data = employee.employee_name

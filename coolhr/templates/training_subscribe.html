@@ -19,12 +19,11 @@
         data-target="#training-details{{train.training_id}}"
         style="cursor: pointer"
       >
-        <!-- <td><button style="border-radius: .2rem;" class="btn btn-sm btn-info caret-toggle collapsed" type="button" data-toggle="collapse" data-target="#training-details{{train.training_id}}"></button></td> -->
         <td>{{ train.training_name }}</td>
         {% if train.training_status == True %} {% if train in employee.training_subscriptions %}
         <td>
           <button
-            style="border-radius: 0.2rem"
+            style="border-radius: 0.2rem; z-index: 999"
             class="btn btn-sm btn-outline-danger"
             type="submit"
             name="unsubscribe"
@@ -36,7 +35,7 @@
         {% elif train not in employee.training_subscriptions %}
         <td>
           <button
-            style="border-radius: 0.2rem"
+            style="border-radius: 0.2rem; z-index: 999"
             class="btn btn-sm btn-outline-success"
             type="submit"
             name="subscribe"
